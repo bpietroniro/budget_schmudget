@@ -1,0 +1,36 @@
+<header class="banner top">
+  <nav>
+    <ul>
+      <li><a href="">Home</a></li>
+      <li><a href="/budget">My Budget</a></li>
+    </ul>
+
+    <a href="">Sign Out</a>
+  </nav>
+</header>
+
+<header class="budget-info edit-page">
+  <div>
+    <h1>Current Total Budget: <%= format_currency(@budget[:total]) %></h1>
+    <h3>Uncategorized Amount: <%= format_currency(@budget[:uncategorized]) %></h3>
+  </div>
+</header>
+
+<section class="edit-page">
+  <form action="/budget/edit" method="post">
+    <fieldset>
+      <p>To change your total monthly budget, enter the new amount below.</p>
+      <p>(In order to <em><strong>decrease</strong></em> your total, there must be sufficient "uncategorized" funds.)</p>
+      <label>
+        $
+        <input type="text" class="monetary" name="budget-total" 
+          pattern="^\$?[0-9]*($|\.[0-9]{1,2}$)" value="<%= @budget[:total] %>"
+          title="Digits (with or wihout a decimal point) will do the trick!">
+      </label>
+
+    </fieldset>
+    <input type="submit" value="save">
+    <a href="/budget">Cancel</a>
+  </form>
+</section>
+<footer class="banner bottom" id="shortpagefooter"></footer>

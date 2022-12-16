@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Budget, Schmudget</title>
+    <link rel="stylesheet" href="../stylesheets/whitespace-reset.css">
+    <link rel="stylesheet" href="../stylesheets/budgetapp.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cantarell:ital,wght@0,400;0,700;1,400;1,700&family=Mali:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header class="banner top">
+      <nav>
+        <ul>
+          <li><a href="">Home</a></li>
+          <li><a href="">My Budget</a></li>
+          <li><a href="">Categories</a></li>
+        </ul>
+
+        <a href="">Sign In</a>
+      </nav>
+    </header>
+
+    <header class="category-info">
+      <div>
+        <h1>Groceries</h1>
+        <form action="" method="get">
+          <button type="submit" class="edit" href="">
+            Edit
+          </button>
+        </form>
+      </div>
+
+      <div class="amounts">
+        <dl>
+          <dt>Total:</dt>
+          <dd>$280.00</dd>
+        </dl>
+
+        <dl>
+          <dt>Remaining:</dt>
+          <dd>$60.77</dd>
+        </dl>
+
+        <dl>
+          <dt>Spent:</dt>
+          <dd>$219.23</dd>
+        </dl>
+      </div>
+    </header>
+
+    <section>
+      <h2>Expenses</h2>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" class="heading">Description</th>
+            <th scope="col" class="heading">Amount</th>
+            <th scope="col" class="heading">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tofu</td>
+            <td>$2.49</td>
+            <td>12-5-2022</td>
+          </tr>
+
+          <tr>
+            <td>Cookies</td>
+            <td>$4.39</td>
+            <td>12-6-2022</td>
+          </tr>
+          
+          <tr>
+            <td>Rao's</td>
+            <td>$6.99</td>
+            <td>11-27-2022</td>
+          </tr>
+
+          <tr>
+            <td>Super Duper Wuper Fancy Schmancy Oatmilk</td>
+            <td>$5.00</td>
+            <td>12-1-2022</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <form action="">
+        <h3>Log another expense:</h3>
+        <fieldset class="add-new">
+          <label>
+            Description
+            <input type="text" value="" name="" class="longinput">
+          </label>
+
+          <label>
+            Cost
+            <input type="text" value="" name="" class="shortinput">
+          </label>
+
+          <label>
+            Date
+            <input type="date" name="date">
+          </label>
+
+          <input type="submit" value="Add">
+        </fieldset>
+      </form>
+    </section>
+    
+    <footer class="banner bottom"></footer>
+  </body>
+</html>

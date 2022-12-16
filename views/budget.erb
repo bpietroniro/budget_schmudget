@@ -1,0 +1,115 @@
+<header class="banner top">
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/budget">My Budget</a></li>
+    </ul>
+
+    <a href="">Sign Out</a>
+  </nav>
+</header>
+
+<section class="budget-info">
+  <div>
+    <h1>Total Budget: <%= format_currency(@budget[:total]) %></h1>
+    <ul class="amounts">
+      <li>Amount Spent: <%= format_currency(@budget[:spent]) %></li>
+      <li>Amount Remaining: <%= format_currency(@budget[:remaining]) %></li>
+      <li>(Uncategorized: <%= format_currency(@budget[:uncategorized]) %>)</li>
+    </ul>
+  </div>
+  <div>
+    <ul class="buttons">
+      <li><a href="/budget/edit">Edit Budget Plan</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="category-info">
+  <h1>Categories:</h1>
+  <dl>
+    <% @categories.each do |category| %>
+      <dt>
+        <form action="/budget/<%= category[:name] %>">
+          <input type="hidden" value="<%= category[:id] %>" name="category_id">
+          <button type="submit" class="heading"><%= category[:name] %></button>
+        </form>
+        <form action="/budget/delete" method="post">
+          <input type="hidden" value="<%= category[:id] %>" name="category_id">
+          <button
+            onclick="return confirm('Are you sure? Deleting the category will permanently delete all its expenses, and the allocated funds will be returned to the uncategorized portion of your budget.')" class="delete" type="submit"></button>
+  
+        </form>
+      </dt>
+      <dd class="amounts">
+        <ul>
+          <li>
+            <dt>Budgeted Amount:</dt>
+            <dd><%= format_currency(category[:total]) %> </dd>
+          </li>
+
+          <li>
+            <dt>Remaining:</dt>
+            <dd class="<%= remaining_amount_class(category[:remaining]) %>"><%= format_currency(category[:remaining]) %></dd>
+          </li>
+
+          <li>
+            <dt>Spent:</dt>
+            <dd><%= format_currency(category[:spent]) %></dd>
+          </li>
+
+          <li>
+            <dt>% of Whole:</dt>
+            <dd></dd>
+          </li>
+        </ul>
+      </dd>
+    <% end %>
+  </dl>
+</section>
+
+<section id="new-category-form">
+  <% if session[:error] %>
+    <div class="flash error">
+      <% session.delete(:error).lines.each do |line| %>
+        <p><%= line %></p>
+      <% end %>
+    </div>
+  <% end %>
+  <form action="/budget" method="post">
+    <h2>New Category:</h2>
+    <fieldset class="add-new">
+      <label>
+        Name
+        <input type="text" name="name" class="longinput" required>
+      </label>
+
+      <label>
+        Amount to Allocate $
+        <input type="text" name="allocation" class="monetary" required>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <label>
+        Where would you like these funds to come from?
+        <select name="source_id">
+          <option value="uncategorized">
+          Uncategorized (<%= format_currency(@budget[:uncategorized]) %> available)
+          </option>
+          <% @categories.each do |category| %>
+            <option value="<%= category[:id] %>">
+            <%= category[:name] %> (<%= format_currency(category[:remaining]) %> available)
+            </option>
+          <% end %>
+        </select>
+      </label>
+    </fieldset>
+
+    <input type="hidden" value="<%= @budget_id %>" name="budget_id">
+    <input type="hidden" value="<%= @budget[:uncategorized] %>" name="uncategorized_funds">
+    <input type="submit" value="create">
+  </form>
+</section>
+
+<footer class="banner bottom"></footer>

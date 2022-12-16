@@ -1,0 +1,106 @@
+<header class="banner top">
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/budget">My Budget</a></li>
+    </ul>
+
+    <a href="">Sign In</a>
+  </nav>
+</header>
+
+<header class="category-info">
+  <div>
+    <h1><%= @category[:name] %></h1>
+    <ul class="buttons">
+      <li><a class="buttons" href="">Edit "<%= @category[:name] %>"</a></li>
+    </ul>
+  </div>
+
+  <div class="amounts">
+    <dl>
+      <dt>Budgeted:</dt>
+      <dd><%= format_currency(@category[:total]) %></dd>
+    </dl>
+
+    <dl>
+      <dt>Remaining:</dt>
+      <dd class="<%= remaining_amount_class(@category[:remaining]) %>"><%= format_currency(@category[:remaining]) %></dd>
+    </dl>
+
+    <dl>
+      <dt>Spent:</dt>
+      <dd><%= format_currency(@category[:spent]) %></dd>
+    </dl>
+  </div>
+</header>
+
+<section>
+  <% if @expenses.empty? %>
+    <div>
+      <p>There aren't any expenses in this category yet!</p>
+      <p>You can use the form below to start logging expenses.</p>
+    </div>
+
+    <% content_for :footer do %>
+      <footer class="banner bottom" id="shortpagefooter"></footer>
+    <% end %>
+  <% else %>
+    <h2>Expenses</h2>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col" class="heading">Description</th>
+          <th scope="col" class="heading">Amount</th>
+          <th scope="col" class="heading">Date</th>
+          <th scope="col" class="heading"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @expenses.each do |expense| %>
+          <tr>
+            <td><%= expense[:description] %></td>
+            <td><%= format_currency(expense[:amount]) %></td>
+            <td> <%= expense[:date] %></td>
+            <td>
+              <form action="/budget/<%= @category[:name] %>/delete" method="post">
+                <input type="hidden" value="<%= expense[:id] %>"
+                  name="expense_id">
+                  <button class="delete"></button>
+              </form>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% content_for :footer do %>
+      <footer class="banner bottom"></footer>
+    <% end %>
+  <% end %>
+
+  <form action="/budget/<%= @category[:name] %>" method="post">
+    <h3>Log an expense:</h3>
+    <fieldset class="add-new">
+      <label>
+        Description
+        <input type="text" name="description" class="longinput">
+      </label>
+
+      <label>
+        Cost $
+        <input type="text" name="cost" class="shortinput">
+      </label>
+
+      <label>
+        Date
+        <input type="date" name="date">
+      </label>
+
+      <input type="hidden" value="<%= @category[:id] %>" name="category_id">
+
+      <input type="submit" value="Add">
+    </fieldset>
+  </form>
+</section>
+
