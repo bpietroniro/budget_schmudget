@@ -1,0 +1,80 @@
+<header class="banner top">
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/budget">Budget</a></li>
+    </ul>
+
+    <form action="/signout" method="post">
+      <input type="submit" value="Sign Out">
+    </form>
+  </nav>
+</header>
+
+<header class="category-info">
+  <div><h1><%= @category[:name] %></h1></div>
+
+  <div class="amounts">
+    <dl>
+      <dt>Budgeted:</dt>
+      <dd><%= format_currency(@category[:total]) %></dd>
+    </dl>
+
+    <dl>
+      <dt>Remaining:</dt>
+      <dd class="<%= remaining_amount_class(@category[:remaining]) %>"><%= format_currency(@category[:remaining]) %></dd>
+    </dl>
+
+    <dl>
+      <dt>Spent:</dt>
+      <dd><%= format_currency(@category[:spent]) %></dd>
+    </dl>
+  </div>
+</header>
+
+<% if session[:error] %>
+  <div class="flash error">
+    <% session.delete(:error).lines.each do |line| %>
+      <p><%= line %></p>
+    <% end %>
+  </div>
+<% end %>
+<section id="category-form" class="edit">
+  <form action="/budget/categories/<%= @category[:id] %>/edit" method="post">
+    <h2>Editing "<%= @category[:name] %>":</h2>
+    <fieldset class="add-new">
+      <label>
+        New Name
+        <input type="text" name="new_name" class="longinput" value="<%= params[:new_name] %>">
+      </label>
+
+      <label>
+        New Amount to Allocate $
+        <input type="text" name="new_allocation" class="monetary" value="<%= params[:new_allocation] %>">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <label>
+        <p>If you are increasing this category's limit, where would you like the additional funds to come from?</p>
+        <select name="source_id">
+          <option value="uncategorized|<%= @budget[:uncategorized] %>">
+          Uncategorized (<%= format_currency(@budget[:uncategorized]) %> available)
+          </option>
+          
+          <% @other_categories.each do |category| %>
+            <option value="<%= category[:id] %>|<%= category[:remaining] %>">
+            <%= category[:name] %> (<%= format_currency(category[:remaining]) %> available)
+            </option>
+          <% end %>
+        </select>
+      </label>
+    </fieldset>
+
+    <input type="hidden" value="<%= @category[:name] %>" name="current_name">
+    <input type="hidden" value="<%= @category[:total] %>" name="current_allocation">
+    <input type="submit" value="save">
+    <a href="/budget/categories/<%= @category[:id] %>" id="cancelbutton">Cancel</a>
+  </form>
+</section>
+

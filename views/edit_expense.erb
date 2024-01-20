@@ -1,0 +1,129 @@
+<header class="banner top">
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/budget">Budget</a></li>
+    </ul>
+
+    <form action="/signout" method="post">
+      <input type="submit" value="Sign Out">
+    </form>
+  </nav>
+</header>
+
+<header class="category-info">
+  <div>
+    <h1><%= @category[:name] %></h1>
+    <ul class="buttons">
+      <li><a class="buttons" href="/budget/categories/<%= @category[:id] %>/edit">Edit "<%= @category[:name] %>"</a></li>
+    </ul>
+  </div>
+
+  <div class="amounts">
+    <dl>
+      <dt>Budgeted:</dt>
+      <dd><%= format_currency(@category[:total]) %></dd>
+    </dl>
+
+    <dl>
+      <dt>Remaining:</dt>
+      <dd class="<%= remaining_amount_class(@category[:remaining]) %>"><%= format_currency(@category[:remaining]) %></dd>
+    </dl>
+
+    <dl>
+      <dt>Spent:</dt>
+      <dd><%= format_currency(@category[:spent]) %></dd>
+    </dl>
+  </div>
+</header>
+
+<% if session[:page_error] %>
+  <div class="flash error">
+    <p><%= session.delete(:page_error) %></p>
+  </div>
+<% end %>
+
+<section>
+  <h2>Expenses</h2>
+  <% if session[:error] %>
+    <div class="flash error">
+      <p><%= session.delete(:error) %></p>
+    </div>
+  <% end %>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col" class="heading">Description</th>
+        <th scope="col" class="heading">Amount</th>
+        <th scope="col" class="heading">Date</th>
+        <th scope="col" colspan="2" class="heading"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @expenses.each do |expense| %>
+        <% if expense[:id] == @expense_id %>
+          <form action="/budget/categories/<%= @category[:id] %>/expenses/<%= @expense_id %>/edit" method="post">
+            <td>
+              <input type="text" value="<%= params[:new_description] || expense[:description] %>" name="new_description">
+            </td>
+            <td>
+              <input type="text" value="<%= params[:new_amount] || format("%.2f", expense[:amount]) %>" name="new_amount" class="monetary">
+            </td>
+            <td>
+              <input type="date" value="<%= params[:new_date] || expense[:date] %>" name="new_date" required>
+            </td>
+            <td>
+              <input type="submit" value="Save">
+            </td>
+            <td>
+              <a href="/budget/categories/<%= @category[:id] %>" id="cancelbutton">Cancel</a>
+            </td>
+            <input type="hidden" value="<%= @page %>" name="page">
+            <input type="hidden" value="<%= expense[:description] %>" name="current_description">
+            <input type="hidden" value="<%= expense[:amount] %>" name="current_amount">
+          </form>
+        <% else %>
+          <tr>
+            <td><%= expense[:description] %></td>
+            <td><%= format_currency(expense[:amount]) %></td>
+            <td> <%= expense[:date] %></td>
+            <td>
+              <form action="/budget/categories/<%= @category[:id] %>/expenses/<%= expense[:id] %>/delete" method="post">
+                <input type="hidden" value="<%= @page %>" name="page">
+                <button class="delete"></button>
+              </form>
+            </td>
+            <td>
+              <form action="/budget/categories/<%= @category[:id] %>/expenses/<%= expense[:id] %>/edit" method="get">
+                <input type="hidden" value="<%= @page %>" name="page">
+                <button class="edit-button"></button>
+              </form>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+  <nav class="pagination">
+    <% if disable_previous?(@page) %>
+        <span class="navigate disabled">Previous</span>
+    <% else %>
+      <span class="navigate"><a href="/budget/categories/<%= @category[:id] %>?page=<%= @page.to_i - 1 %>">Previous</a></span>
+    <% end %>
+
+    <% (1..number_of_pages(@category[:expense_count])).each do |pagenum| %>
+      <% if pagenum == @page %>
+        <span class="current"><%= pagenum %></span>
+      <% else %>
+        <span><a href="/budget/categories/<%= @category[:id] %>?page=<%= pagenum %>"><%= pagenum %></a></span>
+      <% end %>
+    <% end %>
+
+    <% if disable_next?(@page, @category[:expense_count]) %>
+      <span class="navigate disabled">Next</span>
+    <% else %>
+      <span class="navigate"><a href="/budget/categories/<%= @category[:id] %>?page=<%= @page.to_i + 1 %>">Next</a></span>
+    <% end %>
+  </nav>
+</section>

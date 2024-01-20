@@ -2,18 +2,26 @@
   <nav>
     <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/budget">My Budget</a></li>
+      <li><a href="/budget">Budget</a></li>
     </ul>
 
-    <a href="">Sign In</a>
+    <form action="/signout" method="post">
+      <input type="submit" value="Sign Out">
+    </form>
   </nav>
 </header>
 
 <header class="category-info">
+  <% if session[:page_error] %>
+    <div class="flash error">
+      <p><%= session.delete(:page_error) %></p>
+    </div>
+  <% end %>
+
   <div>
     <h1><%= @category[:name] %></h1>
     <ul class="buttons">
-      <li><a class="buttons" href="">Edit "<%= @category[:name] %>"</a></li>
+      <li><a class="buttons" href="/budget/categories/<%= @category[:id] %>/edit">Edit "<%= @category[:name] %>"</a></li>
     </ul>
   </div>
 
@@ -42,9 +50,6 @@
       <p>You can use the form below to start logging expenses.</p>
     </div>
 
-    <% content_for :footer do %>
-      <footer class="banner bottom" id="shortpagefooter"></footer>
-    <% end %>
   <% else %>
     <h2>Expenses</h2>
     <table>
@@ -53,7 +58,7 @@
           <th scope="col" class="heading">Description</th>
           <th scope="col" class="heading">Amount</th>
           <th scope="col" class="heading">Date</th>
-          <th scope="col" class="heading"></th>
+          <th scope="col" colspan="2" class="heading">Delete/Edit</th>
         </tr>
       </thead>
       <tbody>
@@ -63,10 +68,15 @@
             <td><%= format_currency(expense[:amount]) %></td>
             <td> <%= expense[:date] %></td>
             <td>
-              <form action="/budget/<%= @category[:name] %>/delete" method="post">
-                <input type="hidden" value="<%= expense[:id] %>"
-                  name="expense_id">
-                  <button class="delete"></button>
+              <form action="/budget/categories/<%= @category[:id] %>/expenses/<%= expense[:id] %>/delete" method="post">
+                <input type="hidden" value="<%= @page %>" name="page">
+                <button class="delete"></button>
+              </form>
+            </td>
+            <td>
+              <form action="/budget/categories/<%= @category[:id] %>/expenses/<%= expense[:id] %>/edit" method="get">
+                <input type="hidden" value="<%= @page %>" name="page">
+                <button type="submit" class="edit-button"></button>
               </form>
             </td>
           </tr>
@@ -74,30 +84,51 @@
       </tbody>
     </table>
 
-    <% content_for :footer do %>
-      <footer class="banner bottom"></footer>
-    <% end %>
+    <nav class="pagination">
+      <% if disable_previous?(@page) %>
+        <span class="navigate disabled">Previous</span>
+      <% else %>
+        <span class="navigate"><a href="/budget/categories/<%= @category[:id] %>?page=<%= @page.to_i - 1 %>">Previous</a></span>
+      <% end %>
+
+      <% (1..number_of_pages(@category[:expense_count])).each do |pagenum| %>
+        <% if pagenum == @page %>
+          <span class="current"><%= pagenum %></span>
+        <% else %>
+          <span><a href="/budget/categories/<%= @category[:id] %>?page=<%= pagenum %>"><%= pagenum %></a></span>
+        <% end %>
+      <% end %>
+
+      <% if disable_next?(@page, @category[:expense_count]) %>
+        <span class="navigate disabled">Next</span>
+      <% else %>
+        <span class="navigate"><a href="/budget/categories/<%= @category[:id] %>?page=<%= @page.to_i + 1 %>">Next</a></span>
+      <% end %>
+    </nav>
   <% end %>
 
-  <form action="/budget/<%= @category[:name] %>" method="post">
+  <form action="/budget/categories/<%= @category[:id] %>" method="post">
     <h3>Log an expense:</h3>
+    <% if session[:error] %>
+      <div class="flash error">
+        <p><%= session.delete(:error) %></p>
+      </div>
+    <% end %>
     <fieldset class="add-new">
       <label>
         Description
-        <input type="text" name="description" class="longinput">
+        <input type="text" name="description" class="longinput" value="<%= params[:description] %>">
       </label>
 
       <label>
-        Cost $
-        <input type="text" name="cost" class="shortinput">
+        Amount $
+        <input type="text" name="amount" class="shortinput" value="<%= params[:amount] %>">
       </label>
 
       <label>
         Date
-        <input type="date" name="date">
+        <input type="date" name="date" value="<%= params[:date] || '2022-12-16'%>" required>
       </label>
-
-      <input type="hidden" value="<%= @category[:id] %>" name="category_id">
 
       <input type="submit" value="Add">
     </fieldset>

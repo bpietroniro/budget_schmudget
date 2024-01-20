@@ -1,8 +1,14 @@
 <header class="banner top"></header>
+<div>
+  <% if session[:error] %>
+    <div class="flash error">
+      <p><%= session.delete(:error) %></p>
+    </div>
+  <% end %>
+</div>
 <div class="intro">
-  <h1>Budget, Schmudget</h1>
-  <h2>(an incredibly basic budget management app)</h2>
+  <h1>Budget Schmudget</h1>
+  <p>An expense tracking app that doesn't take itself too seriously.</p>
 
   <a href="/budget" id="start">Get Started</a>
 </div>
-<footer class="banner bottom" id="shortpagefooter"></footer>

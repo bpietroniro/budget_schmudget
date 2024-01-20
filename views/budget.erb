@@ -2,19 +2,28 @@
   <nav>
     <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/budget">My Budget</a></li>
+      <li><a href="/budget">Budget</a></li>
     </ul>
 
-    <a href="">Sign Out</a>
+    <form action="/signout" method="post">
+      <input type="submit" value="Sign Out">
+    </form>
   </nav>
 </header>
 
+<aside>
+  <% if session[:load_error] %>
+    <div class="flash error">
+      <%= session.delete(:load_error) %>
+    </div>
+  <% end %>
+</aside>
 <section class="budget-info">
   <div>
     <h1>Total Budget: <%= format_currency(@budget[:total]) %></h1>
     <ul class="amounts">
       <li>Amount Spent: <%= format_currency(@budget[:spent]) %></li>
-      <li>Amount Remaining: <%= format_currency(@budget[:remaining]) %></li>
+      <li class="<%= remaining_amount_class(@budget[:remaining]) %>">Amount Remaining: <%= format_currency(@budget[:remaining]) %></li>
       <li>(Uncategorized: <%= format_currency(@budget[:uncategorized]) %>)</li>
     </ul>
   </div>
@@ -25,91 +34,74 @@
   </div>
 </section>
 
-<section class="category-info">
-  <h1>Categories:</h1>
-  <dl>
-    <% @categories.each do |category| %>
-      <dt>
-        <form action="/budget/<%= category[:name] %>">
-          <input type="hidden" value="<%= category[:id] %>" name="category_id">
-          <button type="submit" class="heading"><%= category[:name] %></button>
-        </form>
-        <form action="/budget/delete" method="post">
-          <input type="hidden" value="<%= category[:id] %>" name="category_id">
-          <button
-            onclick="return confirm('Are you sure? Deleting the category will permanently delete all its expenses, and the allocated funds will be returned to the uncategorized portion of your budget.')" class="delete" type="submit"></button>
-  
-        </form>
-      </dt>
-      <dd class="amounts">
-        <ul>
-          <li>
-            <dt>Budgeted Amount:</dt>
-            <dd><%= format_currency(category[:total]) %> </dd>
-          </li>
+<% if session[:page_error] %>
+  <div class="flash error">
+    <p><%= session.delete(:page_error) %></p>
+  </div>
+<% end %>
 
-          <li>
-            <dt>Remaining:</dt>
-            <dd class="<%= remaining_amount_class(category[:remaining]) %>"><%= format_currency(category[:remaining]) %></dd>
-          </li>
+<% if @categories_for_page.empty? %>
+  <div>
+    <p>There aren't any categories in your budget right now.</p>
+    <p>Click "Edit Budget Plan" above to add some categories!</p>
+  </div>
+<% else %>
+  <section class="category-info">
+    <h2>Categories:</h2>
+    <dl>
+      <% @categories_for_page.each do |category| %>
+        <dt>
+          <form action="/budget/categories/<%= category[:id] %>">
+            <button type="submit" class="heading"><%= category[:name] %></button>
+          </form>
+          <form action="/budget/categories/<%= category[:id] %>/delete" method="post">
+            <input type="hidden" value="<%= category[:id] %>" name="category_id">
+            <button
+              onclick="return confirm('Are you sure? Deleting the category will permanently delete all its expenses, and the allocated funds will be returned to the uncategorized portion of your budget.')" class="delete" type="submit"></button>
+    
+          </form>
+        </dt>
+        <dd class="amounts">
+          <ul>
+            <li>
+              <dt>Budgeted Amount:</dt>
+              <dd><%= format_currency(category[:total]) %> </dd>
+            </li>
 
-          <li>
-            <dt>Spent:</dt>
-            <dd><%= format_currency(category[:spent]) %></dd>
-          </li>
+            <li>
+              <dt>Remaining:</dt>
+              <dd class="<%= remaining_amount_class(category[:remaining]) %>"><%= format_currency(category[:remaining]) %></dd>
+            </li>
 
-          <li>
-            <dt>% of Whole:</dt>
-            <dd></dd>
-          </li>
-        </ul>
-      </dd>
-    <% end %>
-  </dl>
-</section>
-
-<section id="new-category-form">
-  <% if session[:error] %>
-    <div class="flash error">
-      <% session.delete(:error).lines.each do |line| %>
-        <p><%= line %></p>
+            <li>
+              <dt>Spent:</dt>
+              <dd><%= format_currency(category[:spent]) %></dd>
+            </li>
+          </ul>
+        </dd>
       <% end %>
-    </div>
-  <% end %>
-  <form action="/budget" method="post">
-    <h2>New Category:</h2>
-    <fieldset class="add-new">
-      <label>
-        Name
-        <input type="text" name="name" class="longinput" required>
-      </label>
+    </dl>
 
-      <label>
-        Amount to Allocate $
-        <input type="text" name="allocation" class="monetary" required>
-      </label>
-    </fieldset>
+    <nav class="pagination">
+      <% if disable_previous?(@page) %>
+        <span class="navigate disabled">Previous</span>
+      <% else %>
+        <span class="navigate"><a href="/budget?page=<%= @page.to_i - 1 %>">Previous</a></span>
+      <% end %>
 
-    <fieldset>
-      <label>
-        Where would you like these funds to come from?
-        <select name="source_id">
-          <option value="uncategorized">
-          Uncategorized (<%= format_currency(@budget[:uncategorized]) %> available)
-          </option>
-          <% @categories.each do |category| %>
-            <option value="<%= category[:id] %>">
-            <%= category[:name] %> (<%= format_currency(category[:remaining]) %> available)
-            </option>
-          <% end %>
-        </select>
-      </label>
-    </fieldset>
+      <% (1..number_of_pages(@totals[:category_count].to_i)).each do |pagenum| %>
+        <% if pagenum == @page %>
+          <span class="current"><%= pagenum %></span>
+        <% else %>
+          <span><a href="/budget?page=<%= pagenum %>"><%= pagenum %></a></span>
+        <% end %>
+      <% end %>
 
-    <input type="hidden" value="<%= @budget_id %>" name="budget_id">
-    <input type="hidden" value="<%= @budget[:uncategorized] %>" name="uncategorized_funds">
-    <input type="submit" value="create">
-  </form>
-</section>
-
-<footer class="banner bottom"></footer>
+      <% if disable_next?(@page, @totals[:category_count]) %>
+        <span class="navigate disabled">Next</span>
+      <% else %>
+        <span class="navigate"><a href="/budget?page=<%= @page.to_i + 1 %>">Next</span>
+      <% end %>
+    </nav>
+  </section>
+<% end %>

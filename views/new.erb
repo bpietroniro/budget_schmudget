@@ -1,0 +1,34 @@
+<header class="banner top">
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+    </ul>
+
+    <form action="/signout" method="post">
+      <input type="submit" value="Sign Out">
+    </form>
+  </nav>
+</header>
+
+
+<section class="edit-page">
+  <div class="intro">
+    <h1>Budget Setup</h1>
+  </div>
+  <% if session[:error] %>
+    <div class="flash error">
+      <p><%= session.delete(:error) %></p>
+    </div>
+  <% end %>
+  <form action="/budget/new" method="post">
+    <fieldset>
+      <p>To get started, enter the amount to budget:</p>
+      <label>
+        Budget Total: $
+        <input type="text" class="monetary" name="budget_total">
+      </label>
+
+    </fieldset>
+    <input type="submit" value="save">
+  </form>
+</section>

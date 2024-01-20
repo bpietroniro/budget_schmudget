@@ -1,0 +1,83 @@
+<header class="banner top">
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/budget">Budget</a></li>
+    </ul>
+
+    <form action="/signout" method="post">
+      <input type="submit" value="Sign Out">
+    </form>
+  </nav>
+</header>
+
+<header class="budget-info edit-page">
+  <div>
+    <h1>Current Total Budget: <%= format_currency(@budget[:total]) %></h1>
+    <h3>Uncategorized Amount: <%= format_currency(@budget[:uncategorized]) %></h3>
+  </div>
+</header>
+
+<% if session[:error] %>
+  <div class="flash error">
+    <% session.delete(:error).lines.each do |line| %>
+      <p><%= line %></p>
+    <% end %>
+  </div>
+<% end %>
+<section id="category-form">
+  <form action="/budget/edit/new_category" method="post">
+    <h2>New Category:</h2>
+    <fieldset class="add-new">
+      <label>
+        Name
+        <input type="text" name="name" class="longinput" value="<%= params[:name] %>"required>
+      </label>
+
+      <label>
+        Amount to Allocate $
+        <input type="text" name="allocation" class="monetary" value="<%= params[:allocation] %>" required>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <label>
+        Where would you like these funds to come from?
+        <select name="source_id">
+          <option value="uncategorized|<%= @budget[:uncategorized] %>">
+          Uncategorized (<%= format_currency(@budget[:uncategorized]) %> available)
+          </option>
+          
+          <% if @categories %>
+            <% @categories.each do |category| %>
+              <option value="<%= category[:id] %>|<%= category[:remaining] %>">
+              <%= category[:name] %> (<%= format_currency(category[:remaining]) %> available)
+              </option>
+            <% end %>
+          <% end %>
+        </select>
+      </label>
+    </fieldset>
+
+    <input type="hidden" value="<%= @budget[:uncategorized] %>" name="uncategorized_funds">
+    <input type="submit" value="create">
+  </form>
+</section>
+
+<section class="edit-page">
+  <form action="/budget/edit" method="post">
+    <fieldset>
+      <p>To change your total monthly budget, enter the new amount below.</p>
+      <label>
+        $
+        <input type="text" class="monetary" name="new_total" 
+          pattern="^\$?[0-9]*($|\.[0-9]{1,2}$)" value="<%= format("%.2f", @budget[:total]) %>"
+          title="Digits (with or wihout a decimal point) will do the trick!">
+      </label>
+    </fieldset>
+    <input type="hidden" value="<%= @budget[:total] %>" name="current_total">
+    <input type="hidden" value="<%= @budget[:uncategorized] %>" name="uncategorized_funds">
+    <input type="submit" value="save">
+    <a href="/budget" id="cancelbutton">Cancel</a>
+  </form>
+</section>

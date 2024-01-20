@@ -1,0 +1,25 @@
+<header class="banner top"></header>
+<div class="intro">
+  <% if session[:error] %>
+    <div class="flash error">
+      <p><%= session.delete(:error) %></p>
+    </div>
+  <% end %>
+  <h2>Sign in to get started:</h2>
+  <form action="/signin" method="post">
+    <section>
+      <label>
+        Username:
+        <input type="text" name="username">
+      </label>
+      <label>
+        Password:
+        <input type="password" name="password">
+      </label>
+
+      <div>
+        <input id="signin" type="submit" value="enter">
+      </div>
+    </section>
+  </form>
+</div>
