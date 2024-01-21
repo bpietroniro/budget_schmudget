@@ -1,5 +1,7 @@
 # "Budget Schmudget"
 
+A web application for expense tracking.
+
 ## Specifications
 
 This project was developed using:
@@ -16,13 +18,13 @@ To set up the project:
 2. Ensure PostgreSQL in installed and available for connection
 3. Build the schema by running: `psql -d [my_database] < schema.sql`
 
+![Home Page](assets/home.png)
+
 ## Running the app
 
 After running `bundle install`, to start the app run `ruby budget.rb` from the command line. (If this gives you problems, try `bundle exec ruby budget.rb`.)
 
 From your browser (Chrome recommended), navigate to `localhost:4567`. 
-
-![Home Page](assets/home.png)
 
 ### Username and Password
 
@@ -51,10 +53,10 @@ Once you add categories, they will appear on the `"/budget"` page:
 
 My main objectives for this project were:
 
-- Create a classic CRUD app following best practices
-- Separation of concerns between app logic and database
+- Create a classic CRUD app with a RESTful API, following best practices
+- Separation of concerns between app and database logic
 - Multiple page views
-- Get comfy with PostreSQL
+- Get comfy with PostgreSQL
 - Try my hand at styling with HTML/CSS from scratch
 
 ### Note about the database
