@@ -1,5 +1,7 @@
 # "Budget Schmudget"
 
+A web application for expense tracking.
+
 ## Specifications
 
 This project was developed using:
@@ -51,7 +53,7 @@ Once you add categories, they will appear on the `"/budget"` page:
 
 My main objectives for this project were:
 
-- Create a classic CRUD app following best practices
+- Create a classic CRUD app with a RESTful API, following best practices
 - Separation of concerns between app and database logic
 - Multiple page views
 - Get comfy with PostgreSQL
