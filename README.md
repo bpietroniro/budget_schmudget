@@ -28,12 +28,12 @@ From your browser (Chrome recommended), navigate to `localhost:4567`.
 
 ### Username and Password
 
-Click "Get Started". The login credentials are:
+Click "Get Started". The hardcoded login credentials are:
 
 - username: **HRM**
 - password: **SweetDeetEmpire**
 
-(Support for multiple users in the works. 😉)
+(Functionality for multiple users and real authentication will happen Sometime Later)
 
 You can sign out at any time with the "Sign Out" button at the top right of any page other than the home page. Navigating to any other page while signed out should require authentication first, and on successful authentication should then reroute you to the page you requested.
 
